@@ -1,0 +1,19 @@
+#!/bin/bash
+
+for (( rs = 1; rs < 3; rs++ )); do
+  echo "Intializing replica ${rs} set"
+  replicate_data_node="rs.initiate(); sleep(2000); cfg = rs.conf(); cfg.members[0].host = \"mongors${rs}n1\"; rs.reconfig(cfg); rs.add(\"mongors${rs}n2\"); rs.add(\"mongors${rs}n3\"); rs.status();"
+  docker exec -it mongors${rs}n1 bash -c "echo '${replicate_data_node}' | mongo"
+done
+
+sleep 2
+
+echo "Intializing replica set for the config db"
+  replicate_config_node='rs.initiate(); sleep(2000); cfg = rs.conf(); cfg.members[0].host = "mongocfg1"; rs.reconfig(cfg); rs.add("mongocfg2"); rs.add("mongocfg3"); rs.status();'
+docker exec -t mongocfg1 bash -c "echo '${replicate_config_node}' | mongo"
+
+sleep 5
+# Add better mechanisum to wait for mongos connectivity to be
+# established by tailing docker log for connection readiness
+
+docker exec -it mongos1 bash -c "echo \"sh.addShard('mongors1/mongors1n1:27017'); sh.addShard('mongors2/mongors2n1:27017');\" | mongo "
