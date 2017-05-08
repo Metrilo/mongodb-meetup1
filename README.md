@@ -9,7 +9,6 @@ $ ./initiate
 ```
 $ docker-compose rm
 $ ./reset
-$ DATA_DIR=./data
 $ docker-compose up
 $ ./initiate
 ```
