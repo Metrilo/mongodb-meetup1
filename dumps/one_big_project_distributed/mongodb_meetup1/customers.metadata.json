@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":2,"key":{"_id":1},"name":"_id_","ns":"mongodb_meetup1.customers"},{"v":2,"key":{"shop_id":1.0,"first_order_at":1.0},"name":"shop_id_1_first_order_at_1","ns":"mongodb_meetup1.customers"}]}

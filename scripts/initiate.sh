@@ -1,7 +1,12 @@
 #!/bin/bash
 
+echo "Starting MongoDB sharded cluster"
+docker-compose up -d
+
+sleep 5
+
 # Data replica sets initialization
-for (( rs_index = 1; rs_index <= 2; rs_index++ )); do
+for (( rs_index = 1; rs_index <= 3; rs_index++ )); do
   echo "Intializing replica mongors${rs_index} set"
 
   replicate_data_node="
@@ -41,8 +46,23 @@ sleep 5
 # Routing initialization
 echo "Initialize router with sharding"
 
-# prepare_router_node="sh.status();"
-prepare_router_node="sh.addShard(\"mongors1/mongors1:27018\"); sleep(1000); sh.addShard(\"mongors2/mongors2:27018\"); sleep(1000); sh.status()"
-
+prepare_router_node="
+  sh.addShard(\"mongors1/mongors1:27018\");
+  sleep(1000);
+  sh.addShard(\"mongors2/mongors2:27018\");
+  sleep(1000);
+  sh.addShard(\"mongors3/mongors3:27018\");
+  sleep(1000);
+"
 docker exec -it mongos1 bash -c "echo '${prepare_router_node}' | mongo"
-docker exec -it mongos1 bash -c "echo 'sh.enableSharding(\"mongodb_meetup1\")'"
+
+change_chunk_size="
+  use config;
+  db.settings.save({ _id: \"chunksize\", value: 1 });
+  sleep(1000);
+  sh.status();
+"
+docker exec -it mongos1 bash -c "echo '${change_chunk_size}' | mongo"
+
+enable_sharding_command="sh.enableSharding(\"mongodb_meetup1\");"
+docker exec -it mongos1 bash -c "echo '${enable_sharding_command}' | mongo"

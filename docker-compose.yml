@@ -24,6 +24,18 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ${DATA_DIR}/mongors2:/data/db
 
+  mongors3:
+    container_name: mongors3
+    image: mongo:3.4.4
+    command: mongod --noprealloc --smallfiles --shardsvr --replSet mongors3 --dbpath /data/db --nojournal --oplogSize 16 --noauth
+    environment:
+      TERM: xterm
+    expose:
+      - "27018"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${DATA_DIR}/mongors3:/data/db
+
   mongocfg1:
     container_name: mongocfg1
     image: mongo:3.4.4
@@ -42,6 +54,7 @@ services:
     depends_on:
       - mongors1
       - mongors2
+      - mongors3
       - mongocfg1
     command: mongos --configdb mongocfgrs/mongocfg1:27017 --port 27017
     expose:
