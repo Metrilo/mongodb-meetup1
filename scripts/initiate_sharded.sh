@@ -58,7 +58,7 @@ docker exec -it mongos1 bash -c "echo '${prepare_router_node}' | mongo"
 
 change_chunk_size="
   use config;
-  db.settings.save({ _id: \"chunksize\", value: 1 });
+  db.settings.save({ _id: \"chunksize\", value: 4 });
   sleep(1000);
   sh.status();
 "

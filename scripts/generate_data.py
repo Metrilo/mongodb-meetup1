@@ -5,21 +5,26 @@ from faker import Factory
 import random
 import threading
 import time
+import sys
 
-MONGODB_HOSTNAME = "localhost"
-MONGODB_PORT = 27020
+if len(sys.argv) < 2:
+    raise Exception("At least two arguments must be passed! DB host and port")
 
-# 1000 recods
+MONGODB_HOSTNAME = sys.argv[1]
+MONGODB_PORT = int(sys.argv[2])
+
+# Single insert batch size
 GENERATOR_BATCH_SIZE = 500
+# Number of batch insertion rounds
 GENERATOR_BATCH_ROUNDS = 20
 
-# In three threads
+# In N threads
 GENERATOR_THREADS = 5
 
-# 1 big and 5 small shops
-SHOP_ID_DISTRIBUTION = [1, 1, 1, 1, 1, 2, 3, 4, 5, 6]
-# even distributed
-# SHOP_ID_DISTRIBUTION = [1, 2, 3, 4, 5, 6]
+# Event distributed by shop_id
+SHOP_ID_DISTRIBUTION = [1, 2, 3, 4, 5, 6]
+# Or some different distribution
+# SHOP_ID_DISTRIBUTION = [1, 1, 1, 1, 1, 2, 3, 4, 5, 6]
 
 def mongodb_client():
     return pymongo.MongoClient(MONGODB_HOSTNAME, MONGODB_PORT)
